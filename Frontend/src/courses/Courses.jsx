@@ -5,7 +5,6 @@ import Footer from '../components/Footer'
 
 
 function Courses() {
-  // console.log(list)
   return (
     <>
       <Navbar/>

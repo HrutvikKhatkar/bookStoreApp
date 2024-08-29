@@ -1,20 +1,58 @@
+// eslint-disable-next-line no-unused-vars
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Login from "./Login";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 function Signup() {
+    
+  const location = useLocation();
+  const navigate = useNavigate()
+  const from = location.state?.from?.pathname || "/";
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const onSubmit = (data) => console.log(data);
+
+  const onSubmit = async (data) => {
+    // console.log(data)
+
+    const userInfo = {
+      fullname: data.fullname,
+      email: data.email,
+      password: data.password,
+    };
+    // console.log(userInfo)
+    //here performing asynchronous operation like calling api so it will take time that's why use async
+    await axios
+      .post("http://localhost:4001/user/signup", userInfo)
+      .then((res) => {
+        console.log(res.data); // then return promise either response:success or error: reject
+        if (res.data) {
+          // alert("Signup successfully");
+          toast.success('Signup Successfully!');
+          // <Navigate to="/" />
+          navigate(from, "/")
+        }
+        localStorage.setItem("Users", JSON.stringify(res.data.user));
+      })
+      .catch((err) => {
+        if(err.response){
+          console.log(err);
+          // alert("Error: " + err.response.data.message )
+          toast.error("Error: " + err.response.data.message);
+      }
+      });
+  };
 
   return (
     <div className="flex h-screen items-center justify-center">
       <div className="w-[600px]">
-        <div className="modal-box">
+        <div className="modal-box  dark:bg-slate-800">
           <form onSubmit={handleSubmit(onSubmit)} method="dialog">
             <Link
               to="/"
@@ -31,11 +69,15 @@ function Signup() {
               <input
                 type="text"
                 placeholder="Enter your fullname"
-                className="w-80 px-3 py-1 border outline-none"
-                {...register("name", { required: true })}
+                className="w-80 px-3 py-1 border outline-none dark:bg-slate-800"
+                {...register("fullname", { required: true })}
               />
-              <br/>
-              {errors.name && <span className="text-sm text-red-500">This field is required</span>}
+              <br />
+              {errors.fullname && (
+                <span className="text-sm text-red-500">
+                  This field is required
+                </span>
+              )}
             </div>
             {/* {Email} */}
             <div className="mt-4 space-y-2">
@@ -44,11 +86,15 @@ function Signup() {
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="w-80 px-3 py-1 border outline-none"
+                className="w-80 px-3 py-1 border outline-none dark:bg-slate-800"
                 {...register("email", { required: true })}
               />
-              <br/>
-              {errors.email && <span className="text-sm text-red-500">This field is required</span>}
+              <br />
+              {errors.email && (
+                <span className="text-sm text-red-500">
+                  This field is required
+                </span>
+              )}
             </div>
             {/* {{Password}} */}
             <div className="mt-4 space-y-2">
@@ -57,15 +103,19 @@ function Signup() {
               <input
                 type="text"
                 placeholder="Enter your password"
-                className="w-80 px-3 py-1 border outline-none"
+                className="w-80 px-3 py-1 border outline-none dark:bg-slate-800"
                 {...register("password", { required: true })}
               />
-              <br/>
-              {errors.password && <span className="text-sm text-red-500">This field is required</span>}
+              <br />
+              {errors.password && (
+                <span className="text-sm text-red-500">
+                  This field is required
+                </span>
+              )}
             </div>
             {/* {Button} */}
             <div className="flex justify-between mt-4">
-              <button className="bg-pink-500 px-3 py-1 hover:bg-pink-700 duration-200 rounded">
+              <button className="bg-pink-500 px-3 py-1 hover:bg-pink-700 duration-200 rounded text-white">
                 Signup
               </button>
               <p className="mr-3 text-xl">
